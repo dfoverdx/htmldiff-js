@@ -5,14 +5,17 @@ const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
-    entry: {
-        htmldiff: './src/Diff.js',
-    },
+    entry: [
+        'babel-polyfill',
+        './src/Diff.js'
+    ],
 
     output: {
-        filename: '[name].min.js',
+        filename: 'htmldiff.min.js',
         path: path.resolve(__dirname, 'dist'),
-        publicPath: '/dist/'
+        publicPath: '/dist/',
+        library: 'HtmlDiff',
+        libraryTarget: 'commonjs2'
     },
 
     module: {
