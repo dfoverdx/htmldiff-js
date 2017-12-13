@@ -1,0 +1,35 @@
+{
+  "name": "htmldiff-js",
+  "version": "1.0.0",
+  "description": "JavaScript port of HtmlDiff.Net which is itself a C# port of HtmlDiff",
+  "main": "index.js",
+  "author": "Jordan Hitch",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dfoverdx/htmldiff-js.git"
+  },
+  "keywords": [
+    "HtmlDiff",
+    "Html",
+    "Diff",
+    "Diff",
+    "Algorithm",
+    "Diff Structured File"
+  ],
+  "bugs": {
+    "url": "https://github.com/dfoverdx/htmldiff-js/issues"
+  },
+  "homepage": "https://github.com/dfoverdx/htmldiff-js#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "clean-webpack-plugin": "^0.1.17",
+    "unminified-webpack-plugin": "^1.4.2"
+  },
+  "peerDependencies": {
+    "webpack": "^3.10.0"
+  }
+}
