@@ -6,8 +6,6 @@ import MatchOptions from './MatchOptions';
 import * as WordSplitter from './WordSplitter';
 import * as Utils from './Utils';
 
-import('babel-polyfill');
-
 // This value defines balance between speed and memory utilization. The higher it is the faster it works and more memory consumes.
 const MatchGranuarityMaximum = 4;
 
