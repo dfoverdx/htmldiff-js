@@ -1,6 +1,6 @@
 {
   "name": "htmldiff-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JavaScript port of HtmlDiff.Net which is itself a C# port of HtmlDiff",
   "main": "./dist/htmldiff.js",
   "author": "Jordan Hitch",
