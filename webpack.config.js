@@ -1,12 +1,10 @@
 const webpack = require('webpack');
 const path = require('path');
-const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
     entry: [
-        'babel-polyfill',
         './src/Diff.js'
     ],
 
@@ -27,12 +25,13 @@ module.exports = {
             }
         ]
     },
+
     plugins: [
         new CleanWebpackPlugin(['dist']),
-        new UglifyJsPlugin({
-            include: /\.js$/,
-            minimize: true,
-        }),
         new UnminifiedWebpackPlugin()
-    ]
+    ],
+
+    optimization: {
+        minimize: true
+    }
 };

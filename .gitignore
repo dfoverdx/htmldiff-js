@@ -1,3 +1,4 @@
 obj 
 .vs
+.vscode
 node_modules
