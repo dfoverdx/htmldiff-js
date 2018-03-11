@@ -6,6 +6,8 @@ import MatchOptions from './MatchOptions';
 import * as WordSplitter from './WordSplitter';
 import * as Utils from './Utils';
 
+import('babel-polyfill');
+
 // This value defines balance between speed and memory utilization. The higher it is the faster it works and more memory consumes.
 const MatchGranuarityMaximum = 4;
 
@@ -114,11 +116,7 @@ class HtmlDiff {
     }
 
     insertTag(tag, cssClass, words) {
-        while (true) {
-            if (words.length === 0) {
-                break;
-            }
-
+        while (words.length) {
             let nonTags = this.extractConsecutiveWords(words, x => !Utils.isTag(x));
 
             let specialCaseTagInjection = '';
@@ -317,6 +315,6 @@ class HtmlDiff {
 
 HtmlDiff.execute = function (oldText, newText) {
     return new HtmlDiff(oldText, newText).build();
-}
+};
 
 export default HtmlDiff;

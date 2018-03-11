@@ -4,9 +4,9 @@ const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
-    entry: [
-        './src/Diff.js'
-    ],
+    entry: {
+        htmldiff: ['./src/Diff.js'],
+    },
 
     output: {
         filename: 'htmldiff.min.js',
