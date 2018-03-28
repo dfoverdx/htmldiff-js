@@ -101,7 +101,7 @@ function convertHtmlToListOfWords(text, blockExpressions) {
                             Utils.isWhiteSpace(state.words[state.words.length - 1])) {
                             let w1 = state.words[state.words.length - 2];
                             let w2 = state.words[state.words.length - 1];
-                            state.words.splice(words.length - 2, 2);
+                            state.words.splice(state.words.length - 2, 2);
                             state.currentWord = [(w1 + w2).split()];
                             state.mode = Mode.whitespace;
                             switchToNextMode = false;
