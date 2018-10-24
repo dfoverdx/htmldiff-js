@@ -20,9 +20,10 @@ const specialCaseClosingTags = new Map([
     ['</sub>', 0],
     ['</strike>', 0],
     ['</s>', 0],
+    ['</dfn>', 0],
 ]);
 
-const specialCaseOpeningTagRegex = /<((strong)|(b)|(i)|(em)|(big)|(small)|(u)|(sub)|(sup)|(strike)|(s))[\>\s]+/ig;
+const specialCaseOpeningTagRegex = /<((strong)|(b)|(i)|(dfn)|(em)|(big)|(small)|(u)|(sub)|(sup)|(strike)|(s))[\>\s]+/ig;
 
 class HtmlDiff {
     constructor(oldText, newText) {
