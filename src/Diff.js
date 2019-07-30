@@ -126,7 +126,9 @@ class HtmlDiff {
                 this.content.push(text);
             } else {
                 if (specialCaseOpeningTagRegex.test(words[0])) {
-                    this.specialTagDiffStack.push(words[0]);
+                    let matchedTag = words[0].match(specialCaseOpeningTagRegex);
+                    matchedTag = '<' + matchedTag[0].replace(/(<|>| )/g, '') + '>';
+                    this.specialTagDiffStack.push(matchedTag);
                     specialCaseTagInjection = '<ins class="mod">';
                     if (tag === 'del') {
                         words.shift();
