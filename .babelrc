@@ -2,7 +2,7 @@
   "presets": [
     ["env", {
       "targets": {
-        "browsers": ["IE 11"]
+        "browsers": ["defaults"]
       }
     }]
   ]
