@@ -27,7 +27,7 @@ Usage
         <p>Some <b>new</b> html goes here</p>
     </div>
 
-    <div id="htmlDiff">
+    <div id="diffHtml">
     </div>
 </body>
 </html>
@@ -39,9 +39,9 @@ Usage
 import HtmlDiff from 'htmldiff-js';
 
 
-let oldHtml = document.getById('oldHtml');
-let newHtml = document.getById('newHtml');
-let diffHtml = document.getById('diffHtml');
+let oldHtml = document.getElementById('oldHtml');
+let newHtml = document.getElementById('newHtml');
+let diffHtml = document.getElementById('diffHtml');
 
 diffHtml.innerHTML = HtmlDiff.execute(oldHtml.innerHTML, newHtml.innerHTML);
 ```
