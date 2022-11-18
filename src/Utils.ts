@@ -3,11 +3,9 @@ const tagWordRegex = /<[^\s>]+/;
 const whitespaceRegex = /^(\s|&nbsp;)+$/;
 const wordRegex = /[\w\#@]+/;
 
-const specialCaseWordTags = [
-    '<img',
-];
+const specialCaseWordTags = ['<img'];
 
-function isTag(item) {
+function isTag(item: string) {
     if (specialCaseWordTags.some(re => item !== null && item.startsWith(re))) {
         return false;
     }
@@ -15,39 +13,47 @@ function isTag(item) {
     return tagRegex.test(item);
 }
 
-function stripTagAttributes(word) {
-    let tag = tagWordRegex.exec(word)[0];
-    word = tag + (word.endsWith("/>") ? "/>" : ">");
+function stripTagAttributes(word: string) {
+    let tags = tagWordRegex.exec(word) || [''];
+    word = tags[0] + (word.endsWith('/>') ? '/>' : '>');
     return word;
 }
 
-function wrapText(text, tagName, cssClass) {
+function wrapText(text: string, tagName: string, cssClass: string) {
     return [
-        '<', tagName, ' class="', cssClass, '">', text, '</', tagName, '>'
+        '<',
+        tagName,
+        ' class="',
+        cssClass,
+        '">',
+        text,
+        '</',
+        tagName,
+        '>',
     ].join('');
 }
 
-function isStartOfTag(val) {
+function isStartOfTag(val: string) {
     return val === '<';
 }
 
-function isEndOfTag(val) {
+function isEndOfTag(val: string) {
     return val === '>';
 }
 
-function isStartOfEntity(val) {
+function isStartOfEntity(val: string) {
     return val === '&';
 }
 
-function isEndOfEntity(val) {
+function isEndOfEntity(val: string) {
     return val === ';';
 }
 
-function isWhiteSpace(value) {
+function isWhiteSpace(value: string) {
     return whitespaceRegex.test(value);
 }
 
-function stripAnyAttributes(word) {
+function stripAnyAttributes(word: string) {
     if (isTag(word)) {
         return stripTagAttributes(word);
     }
@@ -55,7 +61,7 @@ function stripAnyAttributes(word) {
     return word;
 }
 
-function isWord(text) {
+function isWord(text: string) {
     return wordRegex.test(text);
 }
 
@@ -69,5 +75,5 @@ export {
     isEndOfEntity,
     isWhiteSpace,
     stripAnyAttributes,
-    isWord
+    isWord,
 };

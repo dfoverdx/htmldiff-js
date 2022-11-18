@@ -1,4 +1,8 @@
 ﻿export default class Match {
+    startInOld: number;
+    startInNew: number;
+    size: number;
+
     constructor(startInOld, startInNew, size) {
         this.startInOld = startInOld;
         this.startInNew = startInNew;
@@ -12,4 +16,4 @@
     get endInNew() {
         return this.startInNew + this.size;
     }
-};
+}
