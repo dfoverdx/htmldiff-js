@@ -1,1 +1,7 @@
-console.log('Hello world');
+export const helloWorld = () => {
+    return 'Hello world';
+};
+
+export default {
+    helloWorld,
+};
