@@ -1,5 +1,5 @@
 {
-  "name": "html-diff",
+  "name": "html-diff-ts",
   "version": "1.0.0",
   "description": "JavaScript port of [HtmlDiff.NET](https://github.com/Rohland/htmldiff.net) which is itself a C# port of the Ruby implementation, [HtmlDiff](https://github.com/myobie/htmldiff/).",
   "types": "./lib/cjs/types/index.d.ts",
