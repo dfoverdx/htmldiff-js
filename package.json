@@ -1,37 +1,43 @@
 {
-  "name": "htmldiff-js",
-  "version": "1.0.5",
-  "description": "JavaScript port of HtmlDiff.Net which is itself a C# port of HtmlDiff",
-  "main": "./dist/htmldiff.min.js",
-  "author": "Jordan Hitch",
-  "license": "ISC",
+  "name": "html-diff",
+  "version": "1.0.0",
+  "description": "JavaScript port of [HtmlDiff.NET](https://github.com/Rohland/htmldiff.net) which is itself a C# port of the Ruby implementation, [HtmlDiff](https://github.com/myobie/htmldiff/).",
+  "types": "./lib/cjs/types/index.d.ts",
+  "main": "./lib/cjs/index.js",
+  "files": [
+    "lib/**/*"
+  ],
   "scripts": {
-    "build": "webpack --mode production"
+    "clean": "rm -rf ./lib",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc -p ./configs/tsconfig.esm.json && mv lib/esm/index.js lib/esm/index.mjs",
+    "build:cjs": "tsc -p ./configs/tsconfig.cjs.json",
+    "prepack": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dfoverdx/htmldiff-js.git"
+    "url": "git+https://github.com/DubHaus/htmldiff-js.git"
   },
-  "keywords": [
-    "HtmlDiff",
-    "Html",
-    "Diff",
-    "Diff Algorithm",
-    "Diff Structured File"
-  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./lib/esm/types/index.d.ts",
+        "default": "./lib/esm/index.mjs"
+      },
+      "require": {
+        "types": "./lib/cjs/types/index.d.ts",
+        "default": "./lib/cjs/index.js"
+      }
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/dfoverdx/htmldiff-js/issues"
+    "url": "https://github.com/DubHaus/htmldiff-js/issues"
   },
-  "homepage": "https://github.com/dfoverdx/htmldiff-js#readme",
+  "homepage": "https://github.com/DubHaus/htmldiff-js#readme",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.4",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "clean-webpack-plugin": "^0.1.17",
-    "unminified-webpack-plugin": "^2.0.0",
-    "webpack": "^4.40.2",
-    "webpack-cli": "^3.3.9"
+    "typescript": "^4.9.3"
   }
 }
