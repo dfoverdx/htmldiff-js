@@ -61,6 +61,10 @@ function stripAnyAttributes(word: string) {
     return word;
 }
 
+function isNumber(text: string) {
+    return /^\d$/.test(text);
+}
+
 function isWord(text: string) {
     return wordRegex.test(text);
 }
@@ -76,4 +80,5 @@ export {
     isWhiteSpace,
     stripAnyAttributes,
     isWord,
+    isNumber,
 };

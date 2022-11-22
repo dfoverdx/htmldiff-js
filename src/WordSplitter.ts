@@ -63,6 +63,8 @@ class WordSplitter {
                         this.addClearWordSwitchMode(character, Mode.entity);
                     } else if (Utils.isWhiteSpace(character)) {
                         this.addClearWordSwitchMode(character, Mode.whitespace);
+                    } else if (Utils.isNumber(character)) {
+                        this.addClearWordSwitchMode(character, Mode.number);
                     } else if (
                         Utils.isWord(character) &&
                         (this.state.currentWord.length === 0 ||
@@ -94,11 +96,31 @@ class WordSplitter {
 
                     break;
 
+                case Mode.number:
+                    this.state.words.push(this.state.currentWord.join(''));
+                    this.state.currentWord = [];
+
+                    if (Utils.isStartOfTag(character)) {
+                        this.addClearWordSwitchMode(character, Mode.tag);
+                    } else if (Utils.isStartOfEntity(character)) {
+                        this.addClearWordSwitchMode(character, Mode.entity);
+                    } else if (Utils.isNumber(character)) {
+                        this.addClearWordSwitchMode(character, Mode.number);
+                    } else if (Utils.isWhiteSpace(character)) {
+                        this.state.currentWord.push(character);
+                    } else {
+                        this.addClearWordSwitchMode(character, Mode.character);
+                    }
+
+                    break;
+
                 case Mode.whitespace:
                     if (Utils.isStartOfTag(character)) {
                         this.addClearWordSwitchMode(character, Mode.tag);
                     } else if (Utils.isStartOfEntity(character)) {
                         this.addClearWordSwitchMode(character, Mode.entity);
+                    } else if (Utils.isNumber(character)) {
+                        this.addClearWordSwitchMode(character, Mode.number);
                     } else if (Utils.isWhiteSpace(character)) {
                         this.state.currentWord.push(character);
                     } else {
@@ -110,6 +132,8 @@ class WordSplitter {
                 case Mode.entity:
                     if (Utils.isStartOfTag(character)) {
                         this.addClearWordSwitchMode(character, Mode.tag);
+                    } else if (Utils.isNumber(character)) {
+                        this.addClearWordSwitchMode(character, Mode.number);
                     } else if (Utils.isWhiteSpace(character)) {
                         this.addClearWordSwitchMode(character, Mode.whitespace);
                     } else if (Utils.isEndOfEntity(character)) {
@@ -175,7 +199,7 @@ class WordSplitter {
         return this.state.words;
     }
 
-    private static addClearWordSwitchMode(character, mode) {
+    private static addClearWordSwitchMode(character: string, mode: Mode) {
         if (this.state.currentWord.length !== 0) {
             this.state.words.push(this.state.currentWord.join(''));
         }

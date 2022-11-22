@@ -3,7 +3,7 @@
     startInNew: number;
     size: number;
 
-    constructor(startInOld, startInNew, size) {
+    constructor(startInOld: number, startInNew: number, size: number) {
         this.startInOld = startInOld;
         this.startInNew = startInNew;
         this.size = size;

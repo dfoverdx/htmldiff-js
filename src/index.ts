@@ -1,7 +1,3 @@
-export const helloWorld = () => {
-    return 'Hello world';
-};
+import HtmlDiff from './Diff';
 
-export default {
-    helloWorld,
-};
+export default HtmlDiff;

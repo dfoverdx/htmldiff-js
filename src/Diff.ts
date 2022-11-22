@@ -1,9 +1,9 @@
-﻿import Action from './Action';
+﻿import {Action} from './types';
 import Match from './Match';
 import MatchFinder from './MatchFinder';
 import Operation from './Operation';
 import MatchOptions from './MatchOptions';
-import * as WordSplitter from './WordSplitter';
+import WordSplitter from './WordSplitter';
 import * as Utils from './Utils';
 
 // This value defines balance between speed and memory utilization. The higher it is the faster it works and more memory consumes.
@@ -26,6 +26,13 @@ const specialCaseClosingTags = new Map([
 const specialCaseOpeningTagRegex =
     /<((strong)|(b)|(i)|(dfn)|(em)|(big)|(small)|(u)|(sub)|(sup)|(strike)|(s))[\>\s]+/gi;
 
+type FindMathProps = {
+    startInOld: number;
+    endInOld: number;
+    startInNew: number;
+    endInNew: number;
+};
+
 class HtmlDiff {
     private content: string[];
     private newText: string;
@@ -36,9 +43,13 @@ class HtmlDiff {
     private oldWords: string[];
 
     private matchGranularity: number;
-    private blockExpressions: [];
+    private blockExpressions: RegExp[];
 
-    constructor(oldText, newText) {
+    private repeatingWordsAccuracy: number;
+    private ignoreWhiteSpaceDifferences: boolean;
+    private orphanMatchThreshold: number;
+
+    constructor(oldText: string, newText: string) {
         this.content = [];
         this.newText = newText;
         this.oldText = oldText;
@@ -52,6 +63,10 @@ class HtmlDiff {
         this.repeatingWordsAccuracy = 1.0;
         this.ignoreWhiteSpaceDifferences = false;
         this.orphanMatchThreshold = 0.0;
+    }
+
+    public static execute(oldText: string, newText: string) {
+        return new HtmlDiff(oldText, newText).build();
     }
 
     build() {
@@ -75,9 +90,9 @@ class HtmlDiff {
         return this.content.join('');
     }
 
-    // addBlockExpression(exp) {
-    //     this.blockExpressions.push(exp);
-    // }
+    addBlockExpression(exp: RegExp) {
+        this.blockExpressions.push(exp);
+    }
 
     splitInputsIntoWords() {
         this.oldWords = WordSplitter.convertHtmlToListOfWords(
@@ -86,7 +101,7 @@ class HtmlDiff {
         );
 
         //free memory, allow it for GC
-        this.oldText = null;
+        this.oldText = '';
 
         this.newWords = WordSplitter.convertHtmlToListOfWords(
             this.newText,
@@ -94,10 +109,10 @@ class HtmlDiff {
         );
 
         //free memory, allow it for GC
-        this.newText = null;
+        this.newText = '';
     }
 
-    performOperation(opp) {
+    performOperation(opp: Operation) {
         switch (opp.action) {
             case Action.equal:
                 this.processEqualOperation(opp);
@@ -116,33 +131,33 @@ class HtmlDiff {
         }
     }
 
-    processReplaceOperation(opp) {
+    processReplaceOperation(opp: Operation) {
         this.processDeleteOperation(opp, 'diffmod');
         this.processInsertOperation(opp, 'diffmod');
     }
 
-    processInsertOperation(opp, cssClass) {
+    processInsertOperation(opp: Operation, cssClass: string) {
         let text = this.newWords.filter(
             (s, pos) => pos >= opp.startInNew && pos < opp.endInNew
         );
         this.insertTag('ins', cssClass, text);
     }
 
-    processDeleteOperation(opp, cssClass) {
+    processDeleteOperation(opp: Operation, cssClass: string) {
         let text = this.oldWords.filter(
             (s, pos) => pos >= opp.startInOld && pos < opp.endInOld
         );
         this.insertTag('del', cssClass, text);
     }
 
-    processEqualOperation(opp) {
+    processEqualOperation(opp: Operation) {
         let result = this.newWords.filter(
             (s, pos) => pos >= opp.startInNew && pos < opp.endInNew
         );
         this.content.push(result.join(''));
     }
 
-    insertTag(tag, cssClass, words) {
+    insertTag(tag: string, cssClass: string, words: string[]) {
         while (words.length) {
             let nonTags = this.extractConsecutiveWords(
                 words,
@@ -158,9 +173,11 @@ class HtmlDiff {
             } else {
                 if (specialCaseOpeningTagRegex.test(words[0])) {
                     let matchedTag = words[0].match(specialCaseOpeningTagRegex);
-                    matchedTag =
-                        '<' + matchedTag[0].replace(/(<|>| )/g, '') + '>';
-                    this.specialTagDiffStack.push(matchedTag);
+                    if (matchedTag) {
+                        const result =
+                            '<' + matchedTag[0].replace(/(<|>| )/g, '') + '>';
+                        this.specialTagDiffStack.push(result);
+                    }
                     specialCaseTagInjection = '<ins class="mod">';
                     if (tag === 'del') {
                         words.shift();
@@ -226,8 +243,11 @@ class HtmlDiff {
         }
     }
 
-    extractConsecutiveWords(words, condition) {
-        let indexOfFirstTag = null;
+    extractConsecutiveWords(
+        words: string[],
+        condition: (word: string) => boolean
+    ) {
+        let indexOfFirstTag: number | null = null;
 
         for (let i = 0; i < words.length; i++) {
             let word = words[i];
@@ -244,7 +264,7 @@ class HtmlDiff {
 
         if (indexOfFirstTag !== null) {
             let items = words.filter(
-                (s, pos) => pos >= 0 && pos < indexOfFirstTag
+                (_s, pos) => pos >= 0 && pos < (indexOfFirstTag || 0)
             );
             if (indexOfFirstTag > 0) {
                 words.splice(0, indexOfFirstTag);
@@ -253,7 +273,7 @@ class HtmlDiff {
             return items;
         } else {
             let items = words.filter(
-                (s, pos) => pos >= 0 && pos < words.length
+                (_s, pos) => pos >= 0 && pos < words.length
             );
             words.splice(0, words.length);
             return items;
@@ -263,7 +283,7 @@ class HtmlDiff {
     operations() {
         let positionInOld = 0;
         let positionInNew = 0;
-        let operations = [];
+        let operations: Operation[] = [];
 
         let matches = this.matchingBlocks();
         matches.push(new Match(this.oldWords.length, this.newWords.length, 0));
@@ -296,25 +316,25 @@ class HtmlDiff {
 
             if (action !== Action.none) {
                 operations.push(
-                    new Operation(
+                    new Operation({
                         action,
-                        positionInOld,
-                        match.startInOld,
-                        positionInNew,
-                        match.startInNew
-                    )
+                        startInOld: positionInOld,
+                        endInOld: match.startInOld,
+                        startInNew: positionInNew,
+                        endInNew: match.startInNew,
+                    })
                 );
             }
 
-            if (match.length !== 0) {
+            if (match.size !== 0) {
                 operations.push(
-                    new Operation(
-                        Action.equal,
-                        match.startInOld,
-                        match.endInOld,
-                        match.startInNew,
-                        match.endInNew
-                    )
+                    new Operation({
+                        action: Action.equal,
+                        startInOld: match.startInOld,
+                        endInOld: match.endInOld,
+                        startInNew: match.startInNew,
+                        endInNew: match.endInNew,
+                    })
                 );
             }
 
@@ -325,9 +345,9 @@ class HtmlDiff {
         return operations;
     }
 
-    *removeOrphans(matches) {
-        let prev = null;
-        let curr = null;
+    *removeOrphans(matches: Match[]) {
+        let prev = null! as Match;
+        let curr = null! as Match;
 
         for (let next of matches) {
             if (curr === null) {
@@ -337,24 +357,23 @@ class HtmlDiff {
             }
 
             if (
-                (prev.endInOld === curr.startInOld &&
+                (prev?.endInOld === curr.startInOld &&
                     prev.endInNew === curr.startInNew) ||
                 (curr.endInOld === next.startInOld &&
                     curr.endInNew === next.startInNew)
             ) {
                 yield curr;
-                let tmp = (prev = curr); // "let tmp" avoids babel traspiling error
                 curr = next;
                 continue;
             }
 
-            let sumLength = (t, n) => t + n.length;
+            let sumLength = (t: number, n: string) => t + n.length;
 
             let oldDistanceInChars = this.oldWords
-                .slice(prev.endInOld, next.startInOld)
+                .slice(prev?.endInOld, next.startInOld)
                 .reduce(sumLength, 0);
             let newDistanceInChars = this.newWords
-                .slice(prev.endInNew, next.startInNew)
+                .slice(prev?.endInNew, next.startInNew)
                 .reduce(sumLength, 0);
             let currMatchLengthInChars = this.newWords
                 .slice(curr.startInNew, curr.endInNew)
@@ -375,71 +394,76 @@ class HtmlDiff {
     }
 
     matchingBlocks() {
-        let matchingBlocks = [];
-        this.findMatchingBlocks(
-            0,
-            this.oldWords.length,
-            0,
-            this.newWords.length,
-            matchingBlocks
-        );
+        let matchingBlocks = [] as Match[];
+        this.findMatchingBlocks({
+            startInOld: 0,
+            endInOld: this.oldWords.length,
+            startInNew: 0,
+            endInNew: this.newWords.length,
+            matchingBlocks,
+        });
         return matchingBlocks;
     }
 
-    findMatchingBlocks(
+    findMatchingBlocks({
         startInOld,
         endInOld,
         startInNew,
         endInNew,
-        matchingBlocks
-    ) {
-        let match = this.findMatch(startInOld, endInOld, startInNew, endInNew);
+        matchingBlocks,
+    }: FindMathProps & {matchingBlocks: Match[]}) {
+        let match = this.findMatch({
+            startInOld,
+            endInOld,
+            startInNew,
+            endInNew,
+        });
 
         if (match !== null) {
             if (
                 startInOld < match.startInOld &&
                 startInNew < match.startInNew
             ) {
-                this.findMatchingBlocks(
+                this.findMatchingBlocks({
                     startInOld,
-                    match.startInOld,
+                    endInOld: match.startInOld,
                     startInNew,
-                    match.startInNew,
-                    matchingBlocks
-                );
+                    endInNew: match.startInNew,
+                    matchingBlocks,
+                });
             }
 
             matchingBlocks.push(match);
 
             if (match.endInOld < endInOld && match.endInNew < endInNew) {
-                this.findMatchingBlocks(
-                    match.endInOld,
+                this.findMatchingBlocks({
+                    startInOld: match.endInOld,
                     endInOld,
-                    match.endInNew,
+                    startInNew: match.endInNew,
                     endInNew,
-                    matchingBlocks
-                );
+                    matchingBlocks,
+                });
             }
         }
     }
 
-    findMatch(startInOld, endInOld, startInNew, endInNew) {
+    findMatch({startInOld, endInOld, startInNew, endInNew}: FindMathProps) {
         for (let i = this.matchGranularity; i > 0; i--) {
-            let options = new MatchOptions();
+            let options = MatchOptions;
             options.blockSize = i;
             options.repeatingWordsAccuracy = this.repeatingWordsAccuracy;
             options.ignoreWhitespaceDifferences =
                 this.ignoreWhiteSpaceDifferences;
 
-            let finder = new MatchFinder(
-                this.oldWords,
-                this.newWords,
+            let finder = new MatchFinder({
+                oldWords: this.oldWords,
+                newWords: this.newWords,
                 startInOld,
                 endInOld,
                 startInNew,
                 endInNew,
-                options
-            );
+                options,
+            });
             let match = finder.findMatch();
             if (match !== null) {
                 return match;
@@ -449,9 +473,5 @@ class HtmlDiff {
         return null;
     }
 }
-
-HtmlDiff.execute = function (oldText, newText) {
-    return new HtmlDiff(oldText, newText).build();
-};
 
 export default HtmlDiff;

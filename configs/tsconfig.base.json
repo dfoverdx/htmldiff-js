@@ -8,7 +8,8 @@
         "allowJs": true,
         "declaration": true,
         "declarationMap": true,
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": true
     },
     "files": ["../src/index.ts"]
 }
