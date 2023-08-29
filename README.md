@@ -50,3 +50,5 @@ Demo
 ----
 
 I didn't port the demo, but it should output markup the same way the [htmldiff.net demo](https://github.com/Rohland/htmldiff.net/tree/master/Demo) does with a slight exception in what appeared to me to be a bug, which I 'fixed'.  I can no longer remember what that bug was, as I only ported this project quickly in order to use it in another project.
+
+
